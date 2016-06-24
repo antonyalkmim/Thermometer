@@ -81,7 +81,6 @@ void set_analog_channel(uint8_t ch){
 	ADMUX &= 0xF0;
 	if(ch == 0){
 //		ADMUX &= 0xF0;
-		//do something
 	}
 	else if(ch == 1){
 		ADMUX |= 0x01;
@@ -114,3 +113,7 @@ void enable_input(uint8_t pin){
 	DIDR0 &= 0x00;
 	DIDR0 |= pin;
 }
+
+
+
+
