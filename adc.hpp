@@ -3,6 +3,7 @@
 *
 */
 
+#include <avr/interrupt.h>
 
 enum adc_reference{
 	AREF = 0, AVCC = 1,	INTERNAL_1_1 = 3
@@ -12,6 +13,8 @@ enum adc_result_adjust{
 	RIGHT_ADJUST = 0,	LEFT_ADJUST	= 1
 };
 
+/* Inicializa variaveis */
+void adc_init();
 /*	Habilita	 o	ADC	*/
 void enable(bool b);
 /*	Habilita a	interrupção do	ADC	*/
@@ -30,8 +33,29 @@ void set_analog_channel(uint8_t ch);
 void set_prescaler();
 /*	Habilita individualmente cada entrada	 do	ADC	*/
 void enable_input(uint8_t	 pin);
+/*Le dados de um pino*/
+int ADC_readPin(uint8_t pin);
 
+int ADC_readPin(int pin){
+	adc_init();
+	select_reference(INTERNAL_1_1); //Tensão de referência
+	set_analog_channel(pin); //Entrada analógica
+	set_prescaler(); //Divisão do clock da CPU 128
+	set_result_adjust(RIGHT_ADJUST); //Configura a forma que o resultado da conversão do ADC
+	enable(true); //Habilita o ADC
+	ADCSRA = ADCSRA | (1 << ADSC); //Inicializa uma conversao
+	enable_input(pin); //Habilita individualmente cada entrada do ADC
+	while((ADCSRA & 0x10) == 0); //espera a conversao finalizar
+	ADCSRA = ADCSRA | 0x10; //limpar a flag ADC
+	return ADC;
+}
 
+void adc_init(){
+	//Pins Inputs Enabled
+	DIDR0 &= 0x00;
+	//Control and Status Register
+	ADCSRB = 0x00;
+}
 
 void enable(bool b){
 	if(b){
@@ -60,7 +84,7 @@ void select_reference(adc_reference	ref){
 		ADMUX |= (1<<6);
 	}
 	else if(ref == INTERNAL_1_1){
-		ADMUX |= (3<<6);
+		ADMUX |= (3 << 6);
 	}
 }
 
@@ -78,9 +102,10 @@ bool is_left_adjust(){
 }
 
 void set_analog_channel(uint8_t ch){
-	ADMUX &= 0xF0;
+	ADMUX &= 0xf0;
+
 	if(ch == 0){
-//		ADMUX &= 0xF0;
+		//do something
 	}
 	else if(ch == 1){
 		ADMUX |= 0x01;
@@ -110,8 +135,7 @@ void set_prescaler(){
 }
 
 void enable_input(uint8_t pin){
-	DIDR0 &= 0x00;
-	DIDR0 |= pin;
+	DIDR0 |= (1 << pin);
 }
 
 
