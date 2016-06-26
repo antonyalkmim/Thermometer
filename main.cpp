@@ -1,6 +1,6 @@
-#include<avr/io.h>
-#include<util/delay.h>
-#include<avr/interrupt.h>
+#include <avr/io.h>
+#include <util/delay.h>
+#include <avr/interrupt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,14 +44,15 @@ void writeTemperature(){
 
 void writeLuminosity(){
 	char str_temp[17];
+	float lum = 0.0;
 
-	luminosidade = ADC_readPin(1);
+	luminosidade = ADC_readPin(1); //captura luminosidade do pino
 
 	cmd_LCD(0xC0, 0); //vai para segunda linha
 	for(int i=0; i<7; i++) //mover cursor para coluna 8
 		cmd_LCD(0x14, 0);
 
-	dtostrf((float)luminosidade, 2, 1, str_temp);
+	dtostrf((float)luminosidade*100/1023, 3, 2, str_temp);
 	sprintf(str_temp, "%s %%", str_temp);
 	escreve_LCD(str_temp);
 }
