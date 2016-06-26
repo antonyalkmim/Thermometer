@@ -1,6 +1,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
+#include <avr/pgmspace.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,6 +17,9 @@
 int temperatura = 1; //valor da temperatura
 int luminosidade = 0; //quantidade de luz
 
+
+const char name[] PROGMEM = "Antony Alkmim";
+
 void setup(void){
 	DDRA = 0xFF;
 	DDRC = 0xFF;
@@ -26,6 +30,8 @@ void setup(void){
 	escreve_LCD("TEMP: ");
 	cmd_LCD(0xC0, 0);
 	escreve_LCD("LUMIN.: ");
+
+//	escreve_LCD_Flash(name);
 }
 
 void writeTemperature(){

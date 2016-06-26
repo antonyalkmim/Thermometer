@@ -1,6 +1,7 @@
 /**
  * Biblioteca DISPLAY
  */
+#include <avr/pgmspace.h>
 
 /*
  * Enviar caracteres e comandos ao LCD com via de dados de 8 bits.
@@ -71,7 +72,12 @@ void escreve_LCD(char *c){
 }
 
 void escreve_LCD_Flash(const char *c){
-
+	int ch = 0;
+	char word = pgm_read_byte(&c[ch]);
+	while (word != 0) {
+		cmd_LCD(word, 1);
+		word = pgm_read_byte(&c[++ch]);;
+	}
 }
 
 void pulso(){
