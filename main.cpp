@@ -14,59 +14,56 @@
  * PORTA = 22,23
  */
 
-int temperatura = 1; //valor da temperatura
-int luminosidade = 0; //quantidade de luz
+int temperature = 0; //valor da temperatura
+int luminosity = 0; //quantidade de luz
 
 
 const char name[] PROGMEM = "Antony Alkmim";
 
 void setup(void){
-	DDRA = 0xFF;
-	DDRC = 0xFF;
+	DDRA = 0xFF; //RS and Enable pins
+	DDRC = 0xFF; //Data pins
 
 	// Configure Display
-	//========================================
-	inic_LCD_8bits();
-	escreve_LCD("TEMP: ");
-	cmd_LCD(0xC0, 0);
-	escreve_LCD("LUMIN.: ");
-
-//	escreve_LCD_Flash(name);
+	lcd_init();
+	lcd_print("Antony Alkmim");
+	lcd_command(LCD_CURSOR_LN2);
+	lcd_print("CoderUP!");
 }
 
 void writeTemperature(){
 	char str_temp[17];
 
-	temperatura = ADC_readPin(0);
+	temperature = acd_readPin(0);
+	temperature = temperature + (temperature *19)/256;
 
-	cmd_LCD(0x80, 0); //vai para primeira linha
-	for(int i=0; i<7; i++) //mover cursor para coluna 7
-		cmd_LCD(0x14, 0);
+	lcd_command(LCD_CURSOR_LN1); //vai para primeira linha
+	lcd_print("TEMP.:");
 
-	dtostrf((float)temperatura/10, 2, 2, str_temp);
-	sprintf(str_temp, "%s *C", str_temp);
-	escreve_LCD(str_temp);
+	dtostrf((float)temperature/10, 2, 2, str_temp);
+	sprintf(str_temp, "%s %cC", str_temp, (char) 0xDF);
+	lcd_print(str_temp);
 }
 
 void writeLuminosity(){
 	char str_temp[17];
 	float lum = 0.0;
 
-	luminosidade = ADC_readPin(1); //captura luminosidade do pino
+	luminosity = acd_readPin(1); //captura luminosidade do pino
 
-	cmd_LCD(0xC0, 0); //vai para segunda linha
-	for(int i=0; i<7; i++) //mover cursor para coluna 8
-		cmd_LCD(0x14, 0);
+	lcd_command(LCD_CURSOS_LN2); //vai para segunda linha
+	lcd_print("LUMI.:");
 
-	dtostrf((float)luminosidade*100/1023, 3, 2, str_temp);
-	sprintf(str_temp, "%s %%", str_temp);
-	escreve_LCD(str_temp);
+	dtostrf((float)luminosity*100/1023, 3, 2, str_temp);
+	sprintf(str_temp, "%s%%", str_temp);
+	lcd_print(str_temp);
 }
 
 void loop(void){
-	writeTemperature();
-	writeLuminosity();
-	_delay_ms(1000);
+	_delay_ms(3000);
+	lcd_command(LCD_CLEAR); //limpar display
+	writeTemperature(); //imprimir a temperatura do LM35
+	writeLuminosity(); //imprimir a luminosidade do LDR
 }
 
 
