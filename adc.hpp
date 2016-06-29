@@ -16,35 +16,35 @@ enum adc_result_adjust{
 /* Inicializa variaveis */
 void adc_init();
 /*	Habilita	 o	ADC	*/
-void enable(bool b);
-/*	Habilita a	interrupção do	ADC	*/
-void enable_interrupt_adc();
-/*	Inicia a	conversão,	 ativa auto	disparo */
-void start();
-/*	Seleciona a	tensão de	referência do	ADC	*/
-void select_reference(adc_reference ref);
-/*	Configura a	 forma	que o	resultado da	conversão do	ADC	*/
-void set_result_adjust(adc_result_adjust adj);
-/*	Verifica se	o	resultado da	conversão está ajustado à esquerda */
-bool is_left_adjust();
-/*	Seleciona a	entrada	 analógica que será conectada ao ADC	*/
-void set_analog_channel(uint8_t ch);
-/*	Seleciona a	divisão do	clock	 do	ADC	*/
-void set_prescaler();
-/*	Habilita individualmente cada entrada	 do	ADC	*/
-void enable_input(uint8_t	 pin);
+void adc_enable(bool b);
+/* Habilita a interrupção do ADC */
+void adc_enableInterrupt();
+/* Inicia a conversão, ativa auto disparo */
+void adc_start();
+/* Seleciona a tensão de referência do ADC */
+void adc_selectReference(adc_reference ref);
+/* Configura a forma que o resultado da conversão do ADC */
+void adc_set_resultAdjust(adc_result_adjust adj);
+/* Verifica se o resultado da conversão está ajustado à esquerda */
+bool adc_isLeftAdjust();
+/* Seleciona a entrada analógica que será conectada ao ADC */
+void adc_setAnalogChannel(uint8_t ch);
+/* Seleciona a divisão do clock do ADC */
+void adc_setPrescaler();
+/* Habilita individualmente cada entrada do ADC */
+void adc_enableInput(uint8_t pin);
 /*Le dados de um pino*/
-int ADC_readPin(uint8_t pin);
+int acd_readPin(uint8_t pin);
 
-int ADC_readPin(int pin){
+int acd_readPin(int pin){
 	adc_init();
-	select_reference(INTERNAL_1_1); //Tensão de referência
-	set_analog_channel(pin); //Entrada analógica
-	set_prescaler(); //Divisão do clock da CPU 128
-	set_result_adjust(RIGHT_ADJUST); //Configura a forma que o resultado da conversão do ADC
-	enable(true); //Habilita o ADC
+	adc_selectReference(INTERNAL_1_1); //Tensão de referência
+	adc_setAnalogChannel(pin); //Entrada analógica
+	adc_setPrescaler(); //Divisão do clock da CPU 128
+	adc_setResultAdjust(RIGHT_ADJUST); //Configura a forma que o resultado da conversão do ADC
+	adc_enable(true); //Habilita o ADC
 	ADCSRA = ADCSRA | (1 << ADSC); //Inicializa uma conversao
-	enable_input(pin); //Habilita individualmente cada entrada do ADC
+	adc_enableInput(pin); //Habilita individualmente cada entrada do ADC
 	while((ADCSRA & 0x10) == 0); //espera a conversao finalizar
 	ADCSRA = ADCSRA | 0x10; //limpar a flag ADC
 	return ADC;
@@ -57,7 +57,7 @@ void adc_init(){
 	ADCSRB = 0x00;
 }
 
-void enable(bool b){
+void adc_enable(bool b){
 	if(b){
 		ADCSRA |= (1 << 7);
 	}else{
@@ -65,17 +65,17 @@ void enable(bool b){
 	}
 }
 
-void enable_interrupt_adc(){
+void adc_enableInterrupt(){
 	SREG |= (1 << 7);
 	ADCSRA |= (1 << 3);
 }
 
-void start(){
+void adc_start(){
 	ADCSRA |= ~(1 << 4);
 	ADCSRA |= (1 << 6) | (1 << 5);
 }
 
-void select_reference(adc_reference	ref){
+void adc_selectReference(adc_reference	ref){
 	if(ref == AREF){
 		ADMUX &= ~(3<<6);
 	}
@@ -88,7 +88,7 @@ void select_reference(adc_reference	ref){
 	}
 }
 
-void set_result_adjust(adc_result_adjust adj){
+void adc_setResultAdjust(adc_result_adjust adj){
 	if(adj == RIGHT_ADJUST){
 		ADMUX &= ~(1<<ADLAR);
 	}
@@ -97,11 +97,11 @@ void set_result_adjust(adc_result_adjust adj){
 	}
 }
 
-bool is_left_adjust(){
+bool adc_isLeftAdjust(){
 	return (ADMUX & (1 << ADLAR));
 }
 
-void set_analog_channel(uint8_t ch){
+void adc_setAnalogChannel(uint8_t ch){
 	ADMUX &= 0xf0;
 
 	if(ch == 0){
@@ -130,11 +130,11 @@ void set_analog_channel(uint8_t ch){
 	}
 }
 
-void set_prescaler(){
+void adc_setPrescaler(){
 	ADCSRA |= 7; //128bits
 }
 
-void enable_input(uint8_t pin){
+void adc_enableInput(uint8_t pin){
 	DIDR0 |= (1 << pin);
 }
 
